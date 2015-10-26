@@ -1,102 +1,115 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
-char* 
-longest_word_for_keys(char* working_keys, char** valid_words)
+// Given a list of working keyboard keys,
+// and a list of valid words,
+// find the longest valid word that can be formed from the working key characters (don't have to use all keys)
+
+// First word in valid_words is longest_word
+// For word in valid_words:
+//     if intersection of working_keys and word is not empty set, and word is longer than previous word:
+//          word is new longest_word
+
+int
+get_num_lines_to_read()
 {
-  // Given a list of working keyboard keys,
-  // and a list of valid words,
-  // find the longest valid word that can be formed from the working key characters (don't have to use all keys)
-
-  // First word in valid_words is longest_word
-  // For word in valid_words:
-  //     if intersection of working_keys and word is not empty set, and word is longer than previous word:
-  //          word is new longes_word
-}
-
-void
-get_num_lines_to_read(char* num_lines_to_read_buffer)
-{
+  int num_lines_to_read;
   puts("How many lines to read?");
   scanf("%d", &num_lines_to_read);
+  return num_lines_to_read;
 }
 
 void
 get_working_keys(char* working_keys_buffer)
 {
+  memset(working_keys_buffer, 0, sizeof(working_keys_buffer));
   puts("What keys work?");
-  scanf("%s", &working_keys);
-  printf("Your working keys are: %s\n", working_keys);
+  scanf("%s", working_keys_buffer);
+  printf("Your working keys are: %s\n", working_keys_buffer);
 }
 
-char*
-intersection(char* string1, char* string2)
+// void
+// get_intersection(char* string1, char* string2, char* intersecting_chars_buffer)
+// {
+//   memset(intersecting_chars_buffer, 0, sizeof(intersecting_chars_buffer));
+//   int i, j;
+//   int num_intersecting_chars = 0;
+//   for (i = 0; i < strlen(string1); i++)
+//   {
+//     for (j = 0; j < strlen(string2); j++)
+//     {
+//       if (string1[i] == string2[j])
+//       {
+//         intersecting_chars_buffer[num_intersecting_chars] = string1[i];
+//         num_intersecting_chars++;
+//       }
+//     }
+//   }
+// }
+
+bool
+word_is_typeable(char* word, char* working_keys)
 {
-  int i, j;
-  int num_intersecting_chars = 0
-  char intersecting_chars[128];
-  for (i = 0; i < strlen(string1); i++)
+  int i, j, match_count;
+  for (i = 0; i < strlen(word); i++)
   {
-    for (j = 0; j < strlen(string2); j++)
+    for (j = 0; j < strlen(working_keys); j++)
     {
-      if (strcasecmp(string1[i], string2[j] == 0)
+      if (word[i] == working_keys[j])
       {
-        intersecting_chars[num_intersecting_chars] = string1[i];
-        num_intersecting_chars++;
+        match_count++;
       }
     }
   }
-  return intersecting_chars;
+  printf("strlen(%s): %d\n", word, strlen(word));
+  printf("match_count: %d\n", match_count);
+  return match_count == strlen(word);
 }
 
 int
 main(int argc, char** argv)
 {
-  int num_lines_to_read;
-  get_num_lines_to_read(num_lines_to_read);
+  int num_lines_to_read = get_num_lines_to_read();
   char working_keys[128];
-  char intersecting_chars[128];
   int string_length;
   int i, j;
 
   int max_word_size = 60;
   char valid_word[max_word_size];
-  int longest_word = "";
+  char longest_word[max_word_size];
+  memset(longest_word, 0, max_word_size);
+  printf("Longest word so far is: %s (%d long)\n", longest_word, strlen(longest_word));
 
   FILE * fp;
   fp = fopen("/usr/share/dict/words", "r");
 
   for (i = 0; i < num_lines_to_read; i++)
   {
-    rewind(fp);
-
-    get_working_keys(working_keys);
-
-    for (j = 0; j < 26; j++)
-    {
-    }
-
     if (fp == NULL)
     {
       perror("Error opening file");
     }
     else
     {
+      rewind(fp);
+
+      get_working_keys(working_keys);
+
       while(fgets(valid_word, max_word_size, fp))
       {
-        printf("Valid word: %s\n", valid_word);
-        for (i = 0; i < strlen(valid_word); i++)
+        valid_word[strlen(valid_word)-1] = '\0';
+        printf("Valid word: %s (%d long)\n", valid_word, strlen(valid_word));
+        if (word_is_typeable(valid_word, working_keys))
         {
-          printf("Char: %c\n", valid_word[i]);
-          for (j = 0; j < strlen(working_keys); j++)
+          printf("Longest word so far is: %s (%d long)\n", longest_word, strlen(longest_word));
+          if (strlen(valid_word) > strlen(longest_word))
           {
-            intersecting_chars = intersection(valid_word[i], working_keys[j]);
-            if (strlen(intersecting_chars) > 0 && strlen(valid_word) > strlen(longest_word))
-            {
-              longest_word = valid_word;
-              printf("Got new longest word: %s\n", longest_word);
-            }
+            memset(longest_word, 0, max_word_size);
+            strcpy(longest_word, valid_word);
+            printf("Got new longest word: %s\n", longest_word);
+            printf("Longest word so far is: %s (%d long)\n", longest_word, strlen(longest_word));
           }
         }
       }
