@@ -3,14 +3,13 @@
 #include <string.h>
 #include <stdbool.h>
 
-// Given a list of working keyboard keys,
-// and a list of valid words,
-// find the longest valid word that can be formed from the working key characters (don't have to use all keys)
+// DailyProgrammer [2015-10-19] Challenge #237 [Easy] Broken Keyboard
+// https://www.reddit.com/r/dailyprogrammer/comments/3pcb3i/20151019_challenge_237_easy_broken_keyboard/
 
-// First word in valid_words is longest_word
-// For word in valid_words:
-//     if intersection of working_keys and word is not empty set, and word is longer than previous word:
-//          word is new longest_word
+// First longest word is the empty string
+// For each word in valid_words:
+//     If all characters in word match a working key, and word is longer than previous word:
+//          Then word is new longest_word
 
 int
 get_num_lines_to_read()
@@ -77,23 +76,20 @@ main(int argc, char** argv)
       while(fgets(valid_word, max_word_size, fp))
       {
         valid_word[strlen(valid_word)-1] = '\0';
-        if (word_is_typeable(valid_word, working_keys))
+        if (word_is_typeable(valid_word, working_keys) && strlen(valid_word) > strlen(longest_word))
         {
-          if (strlen(valid_word) > strlen(longest_word))
-          {
-            memset(longest_word, 0, max_word_size);
-            strcpy(longest_word, valid_word);
-          }
+          memset(longest_word, 0, max_word_size);
+          strcpy(longest_word, valid_word);
         }
       }
-      printf("Longest valid word with your working keys is: %s\n", longest_word);
-      memset(longest_word, 0, max_word_size);
       if (ferror(fp))
       {
         exit(1);
       }
       else
       {
+        printf("Longest valid word with your working keys is: %s\n", longest_word);
+        memset(longest_word, 0, max_word_size);
       }
     }
   }
